@@ -5,6 +5,7 @@ import { CandidateEdit } from "./pages/CandidateEdit";
 import { CandidateNew } from "./pages/CandidateNew";
 import { Dashboard } from "./pages/Dashboard";
 import { Documents } from "./pages/Documents";
+import { GuidedIntake } from "./pages/GuidedIntake";
 import { Settings } from "./pages/Settings";
 import { Trainings } from "./pages/Trainings";
 
@@ -13,6 +14,8 @@ export default function App() {
     <AppLayout>
       <Routes>
         <Route path="/" element={<Dashboard />} />
+        <Route path="/saisie-guidee" element={<GuidedIntake />} />
+        <Route path="/saisie-guidee/:id" element={<GuidedIntake />} />
         <Route path="/candidats/nouveau" element={<CandidateNew />} />
         <Route path="/candidats/:id" element={<CandidateDetail />} />
         <Route path="/candidats/:id/edit" element={<CandidateEdit />} />

@@ -1,4 +1,4 @@
-import { BarChart3, BookOpen, FileText, Plus, Settings } from "lucide-react";
+import { BarChart3, BookOpen, FileText, MessageSquareText, Plus, Settings } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
 type AppLayoutProps = {
@@ -17,6 +17,10 @@ export function AppLayout({ children }: AppLayoutProps) {
           <NavLink to="/" end>
             <BarChart3 size={18} />
             Dashboard
+          </NavLink>
+          <NavLink to="/saisie-guidee">
+            <MessageSquareText size={18} />
+            Saisie guidée
           </NavLink>
           <NavLink to="/candidats/nouveau">
             <Plus size={18} />

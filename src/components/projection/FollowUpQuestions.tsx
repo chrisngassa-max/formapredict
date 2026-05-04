@@ -5,6 +5,7 @@ type FollowUpQuestionsProps = {
 };
 
 const targetLabel = {
+  secretaire: "Secrétaire",
   candidat: "Candidat",
   employeur: "Employeur",
   conseiller: "Conseiller",

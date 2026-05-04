@@ -112,11 +112,22 @@ export type FolderNode = {
 
 export type FollowUpQuestion = {
   id: string;
-  target: "candidat" | "employeur" | "conseiller" | "financeur";
+  target: "secretaire" | "candidat" | "employeur" | "conseiller" | "financeur";
   question: string;
   reason: string;
   priority: "haute" | "moyenne" | "basse";
   relatedAidId?: string;
+  field?: keyof Candidate;
+  answerType?: "text" | "number" | "boolean" | "select";
+  options?: { value: string; label: string }[];
+};
+
+export type GuidedAnswer = {
+  questionId: string;
+  field?: keyof Candidate;
+  status: "answered" | "unknown" | "not_applicable";
+  value?: unknown;
+  answeredAt: string;
 };
 
 export type EvidenceSource = {

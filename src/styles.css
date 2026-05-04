@@ -496,6 +496,85 @@ td small {
   padding-left: 22px;
 }
 
+.guided-layout {
+  align-items: start;
+  display: grid;
+  gap: 18px;
+  grid-template-columns: minmax(0, 1fr) 420px;
+}
+
+.guided-main {
+  display: grid;
+  gap: 18px;
+}
+
+.guided-question-card,
+.projection-live-card {
+  background: white;
+  border: 1px solid #dbe3ea;
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+  display: grid;
+  gap: 18px;
+  padding: 22px;
+}
+
+.guided-question-card h2,
+.projection-live-card h3,
+.projection-live-card h4 {
+  margin: 4px 0 8px;
+}
+
+.guided-question-card p,
+.projection-live-card p {
+  color: #64748b;
+  margin: 0;
+}
+
+.guided-field {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 14px;
+}
+
+.guided-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.projection-live-card {
+  position: sticky;
+  top: 24px;
+}
+
+.live-score-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.aid-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.answer-history {
+  display: grid;
+  gap: 8px;
+}
+
+.history-row {
+  align-items: center;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 12px;
+}
+
 .two-columns {
   display: grid;
   gap: 18px;
@@ -687,8 +766,13 @@ textarea {
   .assistant-header,
   .assistant-scores,
   .assistant-grid,
+  .guided-layout,
   .two-columns {
     grid-template-columns: 1fr;
+  }
+
+  .projection-live-card {
+    position: static;
   }
 
   .page-header {
