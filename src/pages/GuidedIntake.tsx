@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { GuidedIntakePanel } from "../components/ai/GuidedIntakePanel";
 import { ProjectionLiveCard } from "../components/ai/ProjectionLiveCard";
+import { analyzeCandidateWithAi, type AiAnalysis } from "../lib/aiService";
 import { createEmptyCandidate } from "../lib/candidateFactory";
 import { projectCandidate } from "../lib/projectionEngine";
 import { applyGuidedAnswer, getNextGuidedQuestion } from "../lib/questionEngine";
@@ -18,6 +19,9 @@ export function GuidedIntake() {
   const notFound = loadedCandidate === null;
   const [candidate, setCandidate] = useState<Candidate>(() => loadedCandidate ?? createEmptyCandidate());
   const [answers, setAnswers] = useState<GuidedAnswer[]>([]);
+  const [aiAnalysis, setAiAnalysis] = useState<AiAnalysis | null>(null);
+  const [aiError, setAiError] = useState<string | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   if (notFound) {
     return (
@@ -51,6 +55,25 @@ export function GuidedIntake() {
     navigate(`/candidats/${candidate.id}`);
   }
 
+  async function runAiAnalysis() {
+    setIsAnalyzing(true);
+    setAiError(null);
+    const response = await analyzeCandidateWithAi({
+      candidate,
+      projection,
+      localQuestion: currentQuestion,
+    });
+    setIsAnalyzing(false);
+
+    if (response.ok) {
+      setAiAnalysis(response.result);
+      return;
+    }
+
+    setAiAnalysis(null);
+    setAiError(response.error);
+  }
+
   return (
     <div className="page guided-page">
       <header className="page-header">
@@ -60,6 +83,9 @@ export function GuidedIntake() {
           <p>Répondez question par question. La projection se met à jour automatiquement.</p>
         </div>
         <div className="header-actions">
+          <button className="secondary" onClick={runAiAnalysis} disabled={isAnalyzing}>
+            {isAnalyzing ? "Analyse IA..." : "Analyser avec l'IA"}
+          </button>
           <button className="secondary" onClick={saveAndOpenDetail}>
             Ouvrir la fiche complète
           </button>
@@ -72,6 +98,66 @@ export function GuidedIntake() {
       <section className="guided-layout">
         <div className="guided-main">
           <GuidedIntakePanel candidate={candidate} question={currentQuestion} onAnswer={handleAnswer} />
+
+          <section className="panel ai-result-panel">
+            <div className="ai-result-header">
+              <div>
+                <p className="eyebrow">Assistant IA</p>
+                <h3>Analyse Claude</h3>
+              </div>
+              <span className={`status-chip ${aiAnalysis ? "present" : aiError ? "a_verifier" : "optionnel"}`}>
+                {aiAnalysis ? `Confiance ${aiAnalysis.confidence}` : aiError ? "Mode local" : "En attente"}
+              </span>
+            </div>
+
+            {aiError ? (
+              <p className="ai-error">
+                IA indisponible : {aiError} Le moteur local continue de guider la saisie.
+              </p>
+            ) : null}
+
+            {aiAnalysis ? (
+              <div className="ai-analysis">
+                <p>{aiAnalysis.summary}</p>
+                <dl className="breakdown">
+                  <div>
+                    <dt>Aides probables</dt>
+                    <dd>{aiAnalysis.probable_aids.join(", ") || "À confirmer"}</dd>
+                  </div>
+                  <div>
+                    <dt>Commentaire</dt>
+                    <dd>{aiAnalysis.projection_comment}</dd>
+                  </div>
+                </dl>
+                {aiAnalysis.next_questions.length > 0 ? (
+                  <>
+                    <h4>Questions IA proposées</h4>
+                    <ul className="clean-list">
+                      {aiAnalysis.next_questions.map((question) => (
+                        <li key={`${question.field}-${question.question}`}>
+                          <strong>{question.question}</strong> — {question.reason}
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                ) : null}
+                {aiAnalysis.risk_flags.length > 0 ? (
+                  <>
+                    <h4>Risques signalés</h4>
+                    <ul className="clean-list warning-list">
+                      {aiAnalysis.risk_flags.map((risk) => (
+                        <li key={risk}>{risk}</li>
+                      ))}
+                    </ul>
+                  </>
+                ) : null}
+              </div>
+            ) : !aiError ? (
+              <p>
+                Cliquez sur “Analyser avec l'IA” après avoir lancé le serveur IA local et renseigné la clé API.
+              </p>
+            ) : null}
+          </section>
 
           <section className="panel">
             <h3>Historique de saisie</h3>
